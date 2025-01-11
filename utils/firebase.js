@@ -1,11 +1,11 @@
 const firebaseConfig = {
-    apiKey: "AIzaSyCZB_ZhOZCYB0eubTmW47IUWf-3F5ajjzM",
-    authDomain: "yasuulab.firebaseapp.com",
-    projectId: "yasuulab",
-    storageBucket: "yasuulab.firebasestorage.app",
-    messagingSenderId: "210584026290",
-    appId: "1:210584026290:web:be1e9237bde8a3c8ecddab",
-    measurementId: "G-200KM2GHCH"
+    apiKey: "AIzaSyBu6QH52skMXOYZa1L5oAzOY83rjFTI2Ks",
+    authDomain: "yasuulablibrary.firebaseapp.com",
+    projectId: "yasuulablibrary",
+    storageBucket: "yasuulablibrary.appspot.com",
+    messagingSenderId: "823180238764",
+    appId: "1:823180238764:web:f09322cc719d5e337c6409",
+    measurementId: "G-Z3LLP3RWXV"
 };
 
 // Firebaseの初期化
