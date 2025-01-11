@@ -1,4 +1,30 @@
+.book-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto; /* 横スクロールを可能にする */
+    padding: 10px;
+}
+
+.book {
+    flex: 0 0 auto; /* 横並びにする */
+    width: 100px;
+    text-align: center;
+}
+
 .book img {
-    width: 200px;
+    width: 100%;
     height: auto;
+    border-radius: 5px;
+}
+
+/* スマホ対応 */
+@media (max-width: 768px) {
+    .book-carousel {
+        flex-direction: column; /* 縦並びに切り替え */
+        align-items: center; /* 真ん中に寄せる */
+    }
+
+    .book {
+        width: 90%; /* スマホでは幅を広げる */
+    }
 }
