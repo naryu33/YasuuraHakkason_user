@@ -24,8 +24,4 @@ body {
     overflow-y: auto; /* 縦方向にスクロール可能にする */
 }
 
-footer {
-    position: absolute;/*←絶対位置*/
-    bottom: 0; /*下に固定*/
-}
 
