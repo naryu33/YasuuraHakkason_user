@@ -1,0 +1,102 @@
+<!-- zousyo/index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YASUULABシェア図書館 -蔵書一覧-</title>
+    <link rel="stylesheet" href="../home/style.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDKの読み込み -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>YASUULABシェア図書館</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">ホーム</a></li>
+                <li><a href="index.html">蔵書一覧</a></li>
+                <li><a href="../books/index.html">本を検索</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="book-list">
+            <h2>登録された本一覧</h2>
+            <table id="book-table" border="1">
+                <thead>
+                    <tr>
+                        <th>サムネイル</th>
+                        <th>タイトル</th>
+                        <th>著者</th>
+                        <th>在庫</th>
+                    </tr>
+                </thead>
+                <tbody id="book-table-body">
+                    <!-- 本のデータがここに追加されます -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>YASUULABシェア図書館 © 2024</p>
+        <p>お問い合わせ: <a href="mailto:
+            yasuulab@itnav.co.jp">
+            yasuulab@itnav.co.jp</a></p>
+    </footer>
+
+    <script src="../utils/firebase.js"></script>
+    <script>
+        const db = firebase.firestore();
+
+        // Firestoreからデータを取得してテーブルに表示
+        async function fetchData() {
+            const tbody = document.getElementById('book-table-body');
+            tbody.innerHTML = "";  // 初期化
+
+            try {
+                const snapshot = await db.collection('books').get();  // コレクション名を指定
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const row = document.createElement('tr');
+
+                    // 各列を作成してデータを追加
+                    const imgCell = document.createElement('td');
+                    const imgViewer = document.createElement("img");
+                    imgViewer.src = `https://ndlsearch.ndl.go.jp/thumbnail/${data.isbn}.jpg`
+                    imgCell.appendChild(imgViewer); // <td><img /></td>
+                    row.appendChild(imgCell);
+
+                    const titleCell = document.createElement('td');
+                    titleCell.textContent = data.title;
+                    row.appendChild(titleCell);
+
+                    const authorCell = document.createElement('td');
+                    authorCell.textContent = data.author;
+                    row.appendChild(authorCell);
+
+                    const stockCell = document.createElement('td');
+                    stockCell.textContent = data.isStock ? "在庫あり" : "貸出中";
+                    row.appendChild(stockCell);
+                    
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("データの取得に失敗しました:", error);
+                tbody.innerHTML = "<tr><td colspan='4'>データの取得に失敗しました。</td></tr>";
+            }
+        }
+
+        // ページ読み込み時にデータを取得
+        window.onload = fetchData;
+    </script>
+
+</body>
+
+</html>

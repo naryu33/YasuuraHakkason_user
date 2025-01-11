@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YASUULABシェア図書館 -蔵書検索-</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../home/style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>YASUULABシェア図書館</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">ホーム</a></li>
+                <li><a href="../zousyo/index.html">蔵書一覧</a></li>
+                <li><a href="index.html">本を検索</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content Section -->
+    <main>
+        <!-- 検索フォーム -->
+        <section id="search-book">
+            <h2>本を検索する</h2>
+            <form id="search-form">
+                <label for="search-query">検索キーワード:</label>
+                <input type="text" id="search-query" name="search-query" placeholder="タイトル、著者、ジャンルで検索">
+                <button type="submit">検索</button>
+            </form>
+        </section>
+
+        <!-- 検索結果の表示エリア -->
+        <section id="search-results">
+            <h2>検索結果</h2>
+            <p id="search-message"></p> <!-- 検索結果メッセージ -->
+            <table id="book-table" border="1">
+                <tbody id="book-table-body">
+                    <!-- 本のデータがここに追加されます -->
+                </tbody> <!-- ここに検索結果を表示 -->
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>YASUULABシェア図書館 © 2024</p>
+        <p>お問い合わせ: <a href="mailto:
+            yasuulab@itnav.co.jp">
+            yasuulab@itnav.co.jp</a></p>
+    </footer>
+
+    <script src="../utils/firebase.js"></script>
+    <script>
+        const db = firebase.firestore();
+        // 検索フォームのイベント処理
+        document.getElementById("search-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const query = document.getElementById("search-query").value.trim().toLowerCase();
+            searchBooks(query);
+        });
+
+        // 本を検索して結果を表示する関数
+        async function searchBooks(query) {
+            query = query.split(" ")
+            const matchBooks =[]
+
+            console.log(query);
+            let resultsNum = 0;
+            const tbody = document.getElementById('book-table-body');
+            tbody.innerHTML = ""; // 結果のリストをクリア
+            try {
+                snapshot = await db.collection('books').get()
+                console.log(snapshot)
+                snapshot.forEach(doc => {
+                    if(doc.data().author.indexOf(query) != -1){matchBooks.push(doc)}
+                    else if (doc.data().title.indexOf(query) != -1){matchBooks.push(doc)}
+                })
+                
+                matchBooks.forEach(doc => {
+                    const data = doc.data();
+                    const row = document.createElement('tr');
+                    // 各列を作成してデータを追加
+                    const imgCell = document.createElement('td');
+                    const imgViewer = document.createElement("img");
+                    imgViewer.src = `https://ndlsearch.ndl.go.jp/thumbnail/${data.isbn}.jpg`
+                    imgCell.appendChild(imgViewer); // <td><img /></td>
+                    row.appendChild(imgCell);
+
+                    const titleCell = document.createElement('td');
+                    titleCell.textContent = data.title;
+                    row.appendChild(titleCell);
+
+                    const authorCell = document.createElement('td');
+                    authorCell.textContent = data.author;
+                    row.appendChild(authorCell);
+
+                    const stockCell = document.createElement('td');
+                    stockCell.textContent = data.isStock ? "在庫あり" : "貸出中";
+                    row.appendChild(stockCell);
+
+                    tbody.appendChild(row);
+
+                    resultsNum++
+                })
+
+                // 結果がある場合リストに追加、ない場合メッセージを表示
+                if (resultsNum > 0) {
+                    document.getElementById("search-message").textContent = `${resultsNum}件の結果が見つかりました`;
+                } else {
+                    document.getElementById("search-message").textContent = "該当する本が見つかりませんでした";
+                }
+            } catch (error) {
+                console.error("Error fetching books:", error);
+                document.getElementById("search-message").textContent = "検索中にエラーが発生しました。";
+            }
+        }
+    </script>
+</body>
+</html>

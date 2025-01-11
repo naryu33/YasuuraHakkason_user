@@ -1,0 +1,123 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 全体の高さを確保する */
+body, html {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* メインコンテンツの調整 */
+main {
+    flex: 1; /* mainセクションが余白を埋めるように設定 */
+    padding: 2rem;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header Styling */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2rem;
+}
+
+header nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+header nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+header nav ul li a:hover {
+    color: #ccc;
+}
+
+/* Main Section Styling */
+main {
+    padding: 2rem;
+}
+
+#about, #books, #search {
+    margin-bottom: 2rem;
+}
+
+#books .book-carousel {
+    display: flex;
+    gap: 1rem;
+}
+
+#books .book {
+    background-color: #e0e0e0;
+    padding: 1rem;
+    flex: 1;
+    text-align: center;
+    border-radius: 8px;
+}
+
+/* Search Bar Styling */
+#search {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+#search input[type="text"] {
+    padding: 0.5rem;
+    width: 60%;
+    max-width: 400px;
+    margin-right: 0.5rem;
+}
+
+#search button {
+    padding: 0.5rem 1rem;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+#search button:hover {
+    background-color: #555;
+}
+
+/* Footer Styling */
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+    bottom: 0;
+    left: 0;
+    width: 100%; /* 横幅いっぱいに */
+}
+
+footer a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #fff;
+}
