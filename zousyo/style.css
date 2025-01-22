@@ -1,0 +1,27 @@
+tbody {
+    color: #222222;
+}
+
+#book-table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+#book-table th, #book-table td {
+    padding: 12px;
+    border: 1px solid #4a4a4a; /* 控えめな境界線 */
+    text-align: left;
+}
+
+#book-table th {
+    color: #222222; /* 見出し文字色の落ち着いたグレー */
+    font-weight: normal;
+}
+
+body {
+    height: calc(100vh - 120px); /* ビューポート全体の高さからヘッダーとフッターの高さを引く */
+    overflow-y: auto; /* 縦方向にスクロール可能にする */
+}
+
+

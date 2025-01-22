@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YASUULABシェア図書館 -ホーム-</title>
+    <link rel="stylesheet" href="home/style.css">
+    <link rel="stylesheet" href="home/home.css">
+    <!-- Firebase SDKの読み込み -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>YASUULABシェア図書館</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="zousyo/index.html">蔵書一覧</a></li>
+                <li><a href="books/index.html">本を検索</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content Section -->
+    <main>
+        <!-- Introduction Section -->
+        <section id="about">
+            <h2>ようこそ YASUULABシェア図書館へ</h2>
+            <p>安浦町のみなさんの声から生まれた、地域のための図書館です。
+                <br>ここにある本はすべて、安浦町の方々から寄贈いただいた大切な一冊一冊です。
+                <br>本を通じて広がるつながりと、新しい発見を楽しんでいただければ幸いです。
+                <br>
+                <br>ぜひ、心ゆくまでお楽しみください！
+            </p>
+        </section>
+
+        <!-- Featured Books Section -->
+        <section id="recommended-books">
+            <h2>おすすめの本</h2>
+            <div id="recommended-list">
+                <!-- おすすめの本がここに表紙付きで表示されます -->
+            </div>
+        </section>
+
+
+    </main>
+
+    <script src="../utils/firebase.js"></script>
+    <script>
+        const db = firebase.firestore();
+
+        // おすすめの本を取得してボックスで表示
+        async function fetchRecommendedBooks() {
+            const list = document.getElementById('recommended-list');
+            list.innerHTML = ""; // 初期化
+
+            try {
+                const snapshot = await db.collection('books').where('isRecommended', '==', true).get();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+
+                    // ボックス要素を作成
+                    const bookDiv = document.createElement('div');
+                    bookDiv.className = 'recommended-book';
+
+                    // 表紙画像
+                    const img = document.createElement('img');
+                    img.src = `https://ndlsearch.ndl.go.jp/thumbnail/${data.isbn}.jpg`;
+                    img.alt = `${data.title}の表紙`;
+
+                    // タイトルと著者名
+                    const bookInfo = document.createElement('div');
+                    bookInfo.className = 'book-info';
+                    bookInfo.innerHTML = `
+                <h3>${data.title}</h3>
+                <p>${data.author}</p>
+            `;
+
+                    // ボックスに要素を追加
+                    bookDiv.appendChild(img);
+                    bookDiv.appendChild(bookInfo);
+                    list.appendChild(bookDiv);
+                });
+            } catch (error) {
+                console.error("おすすめの本の取得に失敗しました:", error);
+                list.innerHTML = "<p>おすすめの本の取得に失敗しました。</p>";
+            }
+        }
+
+        // ページ読み込み時にデータを取得
+        window.onload = fetchRecommendedBooks;
+
+    </script>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>YASUULABシェア図書館 © 2024</p>
+        <p>お問い合わせ: <a href="mailto:
+            yasuulab@itnav.co.jp">
+                yasuulab@itnav.co.jp</a></p>
+    </footer>
+</body>
+
+</html>
