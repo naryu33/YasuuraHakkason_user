@@ -34,6 +34,7 @@
                         <th>サムネイル</th>
                         <th>タイトル</th>
                         <th>著者</th>
+                        <th>ジャンル</th>
                         <th>在庫</th>
                     </tr>
                 </thead>
@@ -80,6 +81,10 @@
                     const authorCell = document.createElement('td');
                     authorCell.textContent = data.author;
                     row.appendChild(authorCell);
+
+                    const genreCell = document.createElement('td');
+                    genreCell.textContent = data.genre || "未設定"; // ジャンルがない場合は「未設定」と表示
+                    row.appendChild(genreCell);
 
                     const stockCell = document.createElement('td');
                     stockCell.textContent = data.isStock ? "在庫あり" : "貸出中";
