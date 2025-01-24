@@ -1,4 +1,3 @@
-<!-- zousyo/index.html -->
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -20,7 +19,9 @@
             <ul>
                 <li><a href="../index.html">ホーム</a></li>
                 <li><a href="index.html">蔵書一覧</a></li>
+                <li><a href="../add_books/index.html">本を登録</a></li>
                 <li><a href="../books/index.html">本を検索</a></li>
+                <li><a href="../karikashi/index.html">貸出・返却</a></li>
             </ul>
         </nav>
     </header>
@@ -36,6 +37,7 @@
                         <th>著者</th>
                         <th>ジャンル</th>
                         <th>在庫</th>
+                        <th>おすすめ</th>
                     </tr>
                 </thead>
                 <tbody id="book-table-body">
@@ -47,22 +49,90 @@
 
     <footer>
         <p>YASUULABシェア図書館 © 2024</p>
-        <p>お問い合わせ: <a href="mailto:
-            yasuulab@itnav.co.jp">
-            yasuulab@itnav.co.jp</a></p>
+        <p>お問い合わせ: <a href="mailto:yasuulab@itnav.co.jp">yasuulab@itnav.co.jp</a></p>
     </footer>
 
     <script src="../utils/firebase.js"></script>
     <script>
         const db = firebase.firestore();
 
+        const genreMap = {
+            "1": "00 総記",
+            "2": "01 百科事典",
+            "3": "02 年鑑・雑誌",
+            "4": "04 情報科学",
+            "5": "10 哲学",
+            "6": "11 心理学",
+            "7": "12 倫理学",
+            "8": "14 宗教",
+            "9": "15 仏教",
+            "10": "16 キリスト教",
+            "11": "20 歴史総記",
+            "12": "21 日本歴史",
+            "13": "22 外国歴史",
+            "14": "23 伝記",
+            "15": "25 地理",
+            "16": "26 旅行",
+            "17": "30 社会科学総記",
+            "18": "31 政治",
+            "19": "32 法律",
+            "20": "33 経済・財政・統計",
+            "21": "34 経営",
+            "22": "36 社会",
+            "23": "37 教育",
+            "24": "39 民族・風習",
+            "25": "40 自然科学総記",
+            "26": "41 数学",
+            "27": "42 物理学",
+            "28": "43 化学",
+            "29": "44 天文・地学",
+            "30": "45 生物学",
+            "31": "47 医学・歯学・薬学",
+            "32": "50 工学・工学総記",
+            "33": "51 土木",
+            "34": "52 建築",
+            "35": "53 機械",
+            "36": "54 電気",
+            "37": "55 電子通信",
+            "38": "56 海事",
+            "39": "57 採鉱・治金",
+            "40": "58 その他の工学",
+            "41": "60 産業総記",
+            "42": "61 農林業",
+            "43": "62 水産業",
+            "44": "63 商業",
+            "45": "65 交通・通信",
+            "46": "70 芸術総記",
+            "47": "71 絵画・彫刻",
+            "48": "72 写真・工芸",
+            "49": "73 音楽・舞踊",
+            "50": "74 演劇・映画",
+            "51": "75 体育・スポーツ",
+            "52": "76 諸芸・娯楽",
+            "53": "77 家事",
+            "54": "79 コミック・劇画",
+            "55": "80 語学総記",
+            "56": "81 日本語",
+            "57": "82 英米語",
+            "58": "84 ドイツ語",
+            "59": "85 フランス語",
+            "60": "87 各国語",
+            "61": "90 文学総記",
+            "62": "91 日本文学総記",
+            "63": "92 日本文学詩歌",
+            "64": "93 日本文学、小説・物語",
+            "65": "95 日本文学、評論、随筆、その他",
+            "66": "97 海外文学小説",
+            "67": "98 海外文学、その他"
+        };
+
         // Firestoreからデータを取得してテーブルに表示
         async function fetchData() {
             const tbody = document.getElementById('book-table-body');
-            tbody.innerHTML = "";  // 初期化
+            tbody.innerHTML = ""; // 初期化
 
             try {
-                const snapshot = await db.collection('books').get();  // コレクション名を指定
+                const snapshot = await db.collection('books').get(); // コレクション名を指定
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const row = document.createElement('tr');
@@ -70,8 +140,8 @@
                     // 各列を作成してデータを追加
                     const imgCell = document.createElement('td');
                     const imgViewer = document.createElement("img");
-                    imgViewer.src = `https://ndlsearch.ndl.go.jp/thumbnail/${data.isbn}.jpg`
-                    imgCell.appendChild(imgViewer); // <td><img /></td>
+                    imgViewer.src = `https://ndlsearch.ndl.go.jp/thumbnail/${data.isbn}.jpg`;
+                    imgCell.appendChild(imgViewer);
                     row.appendChild(imgCell);
 
                     const titleCell = document.createElement('td');
@@ -83,18 +153,38 @@
                     row.appendChild(authorCell);
 
                     const genreCell = document.createElement('td');
-                    genreCell.textContent = data.genre || "未設定"; // ジャンルがない場合は「未設定」と表示
+                    const genreName = genreMap[data.genre] || "未設定"; // 対応表から取得。該当がない場合は「未設定」
+                    genreCell.textContent = genreName;
                     row.appendChild(genreCell);
 
                     const stockCell = document.createElement('td');
                     stockCell.textContent = data.isStock ? "在庫あり" : "貸出中";
                     row.appendChild(stockCell);
-                    
+
+                    // おすすめ列の追加
+                    const recommendCell = document.createElement('td');
+                    const recommendCheckbox = document.createElement('input');
+                    recommendCheckbox.type = "checkbox";
+                    recommendCheckbox.checked = data.isRecommended || false; // 初期値
+                    recommendCheckbox.addEventListener('change', async (event) => {
+                        try {
+                            await db.collection('books').doc(doc.id).update({
+                                isRecommended: event.target.checked
+                            });
+                            alert(event.target.checked ? 'おすすめに追加しました！' : 'おすすめを解除しました。');
+                        } catch (error) {
+                            console.error("おすすめの更新に失敗しました:", error);
+                            alert("おすすめの更新に失敗しました。");
+                        }
+                    });
+                    recommendCell.appendChild(recommendCheckbox);
+                    row.appendChild(recommendCell);
+
                     tbody.appendChild(row);
                 });
             } catch (error) {
                 console.error("データの取得に失敗しました:", error);
-                tbody.innerHTML = "<tr><td colspan='4'>データの取得に失敗しました。</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='5'>データの取得に失敗しました。</td></tr>";
             }
         }
 
