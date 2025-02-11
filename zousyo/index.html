@@ -35,7 +35,6 @@
                         <th>著者</th>
                         <th>ジャンル</th>
                         <th>在庫</th>
-                        <th>おすすめ</th>
                     </tr>
                 </thead>
                 <tbody id="book-table-body">
@@ -130,53 +129,38 @@
             tbody.innerHTML = ""; // 初期化
 
             try {
-                const snapshot = await db.collection('books').get(); // コレクション名を指定
+                const snapshot = await db.collection('books').orderBy('title', 'asc').get();
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const row = document.createElement('tr');
 
-                    // 各列を作成してデータを追加
+                    // サムネイル画像
                     const imgCell = document.createElement('td');
                     const imgViewer = document.createElement("img");
                     imgViewer.src = `https://ndlsearch.ndl.go.jp/thumbnail/${data.isbn}.jpg`;
                     imgCell.appendChild(imgViewer);
                     row.appendChild(imgCell);
 
+                    // タイトル
                     const titleCell = document.createElement('td');
                     titleCell.textContent = data.title;
                     row.appendChild(titleCell);
 
+                    // 著者
                     const authorCell = document.createElement('td');
                     authorCell.textContent = data.author;
                     row.appendChild(authorCell);
 
+                    // ジャンル
                     const genreCell = document.createElement('td');
-                    const genreName = genreMap[data.genre] || "未設定"; // 対応表から取得。該当がない場合は「未設定」
+                    const genreName = genreMap[data.genre] || "未設定";
                     genreCell.textContent = genreName;
                     row.appendChild(genreCell);
 
+                    // 在庫状況
                     const stockCell = document.createElement('td');
                     stockCell.textContent = data.isStock ? "在庫あり" : "貸出中";
                     row.appendChild(stockCell);
-
-                    // おすすめ列の追加
-                    const recommendCell = document.createElement('td');
-                    const recommendCheckbox = document.createElement('input');
-                    recommendCheckbox.type = "checkbox";
-                    recommendCheckbox.checked = data.isRecommended || false; // 初期値
-                    recommendCheckbox.addEventListener('change', async (event) => {
-                        try {
-                            await db.collection('books').doc(doc.id).update({
-                                isRecommended: event.target.checked
-                            });
-                            alert(event.target.checked ? 'おすすめに追加しました！' : 'おすすめを解除しました。');
-                        } catch (error) {
-                            console.error("おすすめの更新に失敗しました:", error);
-                            alert("おすすめの更新に失敗しました。");
-                        }
-                    });
-                    recommendCell.appendChild(recommendCheckbox);
-                    row.appendChild(recommendCell);
 
                     tbody.appendChild(row);
                 });
@@ -185,6 +169,7 @@
                 tbody.innerHTML = "<tr><td colspan='5'>データの取得に失敗しました。</td></tr>";
             }
         }
+
 
         // ページ読み込み時にデータを取得
         window.onload = fetchData;
